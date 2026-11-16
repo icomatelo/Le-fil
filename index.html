@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f8fafd" />
+  <title>Le Fil | Actualités</title>
+  <style>
+    :root {
+      --bg: #f8fafd;
+      --surface: #ffffff;
+      --surface-2: #f0f4f9;
+      --surface-3: #e8eef6;
+      --text: #202124;
+      --muted: #5f6368;
+      --subtle: #80868b;
+      --line: #e3e7ed;
+      --blue: #1a73e8;
+      --blue-soft: #e8f0fe;
+      --green: #188038;
+      --orange: #e37400;
+      --red: #d93025;
+      --shadow: 0 1px 2px rgba(60,64,67,.08), 0 2px 8px rgba(60,64,67,.06);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, Roboto, "Segoe UI", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .app-shell { min-height: 100vh; }
+    .topbar { height: 76px; display: flex; align-items: center; gap: 22px; padding: 0 30px; background: rgba(248,250,253,.94); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); }
+    .brand { min-width: 230px; display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--blue); color: white; box-shadow: 0 3px 8px rgba(26,115,232,.24); }
+    .brand-name { font-size: 21px; letter-spacing: -.6px; font-weight: 650; }
+    .brand-sub { color: var(--muted); font-size: 11px; margin-top: 2px; letter-spacing: .15px; }
+    .search-wrap { height: 48px; max-width: 720px; flex: 1; display: flex; align-items: center; gap: 11px; padding: 0 16px; background: #edf2fa; border: 1px solid transparent; border-radius: 15px; transition: .2s; }
+    .search-wrap:focus-within { background: white; border-color: #b8cdf3; box-shadow: 0 1px 4px rgba(26,115,232,.12); }
+    .search-wrap svg { color: var(--muted); flex: none; }
+    .search-wrap input { min-width: 0; width: 100%; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 15px; }
+    .search-wrap input::placeholder { color: #747b84; }
+    .top-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .icon-btn { width: 42px; height: 42px; border: 0; border-radius: 50%; display: grid; place-items: center; color: var(--muted); background: transparent; position: relative; }
+    .icon-btn:hover { background: var(--surface-3); color: var(--text); }
+    .profile-dot { width: 34px; height: 34px; border-radius: 50%; background: #d7e6fd; color: #174ea6; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+    .layout { display: grid; grid-template-columns: 244px minmax(0, 1fr) 290px; gap: 28px; max-width: 1540px; margin: 0 auto; padding: 24px 30px 56px; }
+    .sidebar { position: sticky; top: 100px; align-self: start; max-height: calc(100vh - 120px); overflow-y: auto; padding: 0 8px 22px 0; scrollbar-width: thin; }
+    .nav-group { margin-bottom: 25px; }
+    .nav-label { padding: 0 14px 9px; color: var(--subtle); text-transform: uppercase; font-size: 10px; font-weight: 750; letter-spacing: 1.15px; }
+    .nav-item { width: 100%; min-height: 43px; border: 0; border-radius: 0 24px 24px 0; padding: 0 14px; display: flex; align-items: center; gap: 14px; color: #3c4043; background: transparent; text-align: left; font-size: 14px; font-weight: 540; }
+    .nav-item svg { color: #6e747b; flex: none; }
+    .nav-item:hover { background: #edf2f8; }
+    .nav-item.active { color: #174ea6; background: #dfeafe; font-weight: 650; }
+    .nav-item.active svg { color: #1a73e8; }
+    .nav-count { margin-left: auto; color: var(--muted); font-size: 12px; }
+    .sidebar-bottom { border-top: 1px solid var(--line); padding: 16px 14px 0; color: var(--subtle); font-size: 11px; line-height: 1.6; }
+    .main { min-width: 0; max-width: 850px; width: 100%; margin: 0 auto; }
+    .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin: 3px 0 20px; }
+    .eyebrow { color: var(--blue); text-transform: uppercase; letter-spacing: 1.1px; font-size: 10px; font-weight: 750; margin-bottom: 7px; }
+    h1 { margin: 0; font-size: clamp(25px, 3vw, 32px); letter-spacing: -1px; line-height: 1.15; font-weight: 650; }
+    .head-note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+    .refresh-btn { flex: none; display: inline-flex; align-items: center; gap: 9px; border: 1px solid #d5dce6; background: white; border-radius: 22px; padding: 10px 15px; color: #3c4043; font-size: 13px; font-weight: 600; box-shadow: 0 1px 2px rgba(60,64,67,.04); }
+    .refresh-btn:hover { background: #f4f8ff; border-color: #b7cdf2; }
+    .refresh-btn:disabled { opacity: .65; cursor: wait; }
+    .refresh-btn.spinning svg { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .topic-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 13px; margin-bottom: 8px; scrollbar-width: none; }
+    .topic-row::-webkit-scrollbar { display: none; }
+    .topic-chip { white-space: nowrap; border: 1px solid #d9e0e9; border-radius: 22px; background: white; color: #454b52; padding: 8px 13px; font-size: 12px; font-weight: 600; }
+    .topic-chip:hover { background: #f1f5fb; }
+    .topic-chip.active { color: #174ea6; background: var(--blue-soft); border-color: #c5d7fb; }
+    .feed-meta { min-height: 36px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; margin-bottom: 14px; }
+    .feed-meta strong { color: #3c4043; font-weight: 650; }
+    .meta-controls { display: flex; align-items: center; gap: 13px; }
+    .text-control { border: 0; padding: 5px 0; color: var(--blue); background: transparent; font-weight: 600; font-size: 12px; }
+    .select-control { border: 0; outline: 0; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
+    .feature-card { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(210px,.9fr); gap: 20px; padding: 19px; background: white; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); margin: 0 0 17px; overflow: hidden; }
+    .feature-copy { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+    .kicker { display: inline-flex; align-items: center; gap: 6px; color: #1765c1; background: #edf4ff; border-radius: 6px; padding: 5px 8px; font-size: 10px; text-transform: uppercase; letter-spacing: .65px; font-weight: 750; margin-bottom: 11px; }
+    .feature-title { color: #202124; text-decoration: none; font-size: clamp(19px,2.1vw,25px); line-height: 1.22; letter-spacing: -.45px; font-weight: 650; }
+    .feature-title:hover, .article-title:hover { color: #174ea6; }
+    .feature-summary { color: #5f6368; font-size: 13px; line-height: 1.55; margin: 10px 0 15px; }
+    .source-line { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; margin-top: auto; }
+    .source-avatar { width: 21px; height: 21px; border-radius: 50%; background: #e8edf4; color: #546170; display: grid; place-items: center; font-size: 9px; font-weight: 750; flex: none; }
+    .source-time { color: var(--subtle); }
+    .feature-image { position: relative; min-height: 205px; border-radius: 14px; overflow: hidden; background: linear-gradient(135deg,#c7d9ef,#e9eff7); }
+    .feature-image img { width: 100%; height: 100%; position: absolute; inset: 0; object-fit: cover; }
+    .image-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(40,80,130,.5); }
+    .image-placeholder svg { width: 54px; height: 54px; }
+    .article-list { display: flex; flex-direction: column; gap: 0; }
+    .article-card { padding: 17px 4px 18px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: minmax(0,1fr) 126px; gap: 19px; }
+    .article-card:hover .article-title { color: #174ea6; }
+    .article-main { min-width: 0; display: flex; flex-direction: column; }
+    .article-category { color: var(--blue); font-size: 10px; letter-spacing: .65px; text-transform: uppercase; font-weight: 750; margin-bottom: 6px; }
+    .article-title { font-size: 16px; line-height: 1.34; letter-spacing: -.2px; font-weight: 620; color: #202124; text-decoration: none; }
+    .article-summary { color: #626970; font-size: 12px; line-height: 1.45; margin: 6px 0 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .article-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--subtle); font-size: 10px; margin-top: auto; }
+    .article-footer .source-name { color: #5f6368; font-size: 11px; font-weight: 600; }
+    .dot { width: 3px; height: 3px; border-radius: 50%; background: #aab0b6; }
+    .article-thumb { width: 126px; height: 96px; border-radius: 12px; background: linear-gradient(135deg,#dce7f4,#eff3f8); overflow: hidden; position: relative; align-self: center; }
+    .article-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .article-thumb .image-placeholder svg { width: 28px; height: 28px; }
+    .card-actions { display: flex; align-items: center; gap: 3px; margin-left: auto; }
+    .mini-action { width: 27px; height: 27px; display: grid; place-items: center; border: 0; border-radius: 50%; color: #8a9096; background: transparent; }
+    .mini-action:hover { background: #edf2f8; color: #3c4043; }
+    .mini-action.saved { color: var(--blue); }
+    .mini-action svg { width: 15px; height: 15px; }
+    .right-rail { position: sticky; top: 100px; align-self: start; padding-top: 4px; }
+    .rail-card { background: white; border: 1px solid var(--line); border-radius: 17px; padding: 17px; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(60,64,67,.04); }
+    .rail-title { font-size: 13px; font-weight: 700; margin: 0 0 12px; }
+    .rail-sub { color: var(--muted); font-size: 11px; line-height: 1.5; margin: -6px 0 13px; }
+    .interest { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-top: 1px solid #eff1f4; color: #454b52; font-size: 12px; }
+    .interest:first-of-type { border-top: 0; }
+    .toggle { width: 31px; height: 18px; border-radius: 20px; background: #d9dee5; border: 0; position: relative; flex: none; }
+    .toggle::after { content: ""; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: white; top: 2px; left: 2px; transition: .18s; box-shadow: 0 1px 2px #0002; }
+    .toggle.on { background: #8ab4f8; }
+    .toggle.on::after { left: 15px; background: #1a73e8; }
+    .source-pill { display: inline-flex; align-items: center; border: 1px solid #e1e5eb; border-radius: 16px; padding: 6px 9px; color: #5f6368; font-size: 10px; margin: 0 4px 6px 0; }
+    .rail-link { color: var(--blue); border: 0; background: transparent; padding: 0; font-size: 11px; font-weight: 650; }
+    .tip { display: flex; gap: 10px; align-items: flex-start; color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .tip svg { flex: none; color: var(--blue); }
+    .loading { padding: 56px 20px; text-align: center; color: var(--muted); }
+    .loader { width: 27px; height: 27px; border: 3px solid #dfe7f3; border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
+    .empty { padding: 48px 20px; text-align: center; color: var(--muted); background: white; border: 1px dashed #cfd7e2; border-radius: 17px; }
+    .empty h3 { color: var(--text); font-size: 16px; margin: 10px 0 6px; }
+    .empty p { margin: 0 auto 14px; max-width: 340px; font-size: 12px; line-height: 1.5; }
+    .empty button { border: 0; color: white; background: var(--blue); border-radius: 18px; padding: 9px 15px; font-size: 12px; font-weight: 650; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translate(-50%,20px); opacity: 0; pointer-events: none; transition: .2s; background: #30343a; color: white; border-radius: 24px; padding: 11px 16px; font-size: 12px; z-index: 50; box-shadow: 0 5px 18px #0003; }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    .mobile-nav { display: none; }
+    .modal-backdrop { display: none; position: fixed; inset: 0; z-index: 60; background: rgba(30,36,44,.32); padding: 20px; align-items: center; justify-content: center; }
+    .modal-backdrop.open { display: flex; }
+    .modal { width: min(520px,100%); max-height: 88vh; overflow: auto; border-radius: 22px; padding: 23px; background: white; box-shadow: 0 16px 50px #0003; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .modal h2 { font-size: 20px; margin: 0; letter-spacing: -.4px; }
+    .modal p { color: var(--muted); font-size: 12px; line-height: 1.55; margin: 7px 0 18px; }
+    .modal-topics { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .topic-option { display: flex; align-items: center; gap: 9px; border: 1px solid var(--line); padding: 11px; border-radius: 12px; color: #41474e; font-size: 12px; }
+    .topic-option input { accent-color: var(--blue); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+    .btn-secondary,.btn-primary { padding: 10px 15px; border-radius: 20px; font-size: 12px; font-weight: 650; }
+    .btn-secondary { border: 1px solid var(--line); background: white; color: #4e555e; }
+    .btn-primary { border: 1px solid var(--blue); background: var(--blue); color: white; }
+    .dark { --bg:#17191c; --surface:#202327; --surface-2:#292e34; --surface-3:#343a42; --text:#e8eaed; --muted:#b4bac2; --subtle:#9299a3; --line:#363c44; --blue-soft:#1c3557; --shadow:0 1px 3px #0005; }
+    .dark .topbar,.dark .feature-card,.dark .article-card,.dark .rail-card,.dark .modal,.dark .empty { background:var(--surface); }
+    .dark .topbar { background:rgba(23,25,28,.94); }
+    .dark .search-wrap { background:#2b3037; }
+    .dark .search-wrap:focus-within { background:#202327; }
+    .dark .nav-item { color:#d0d4da; }
+    .dark .nav-item.active { color:#a8c7fa; background:#243750; }
+    .dark .nav-item.active svg { color:#a8c7fa; }
+    .dark .topic-chip,.dark .refresh-btn,.dark .btn-secondary { background:#24282e; border-color:#454c55; color:#d4d8de; }
+    .dark .topic-chip.active { background:#243750; color:#a8c7fa; border-color:#3b5b83; }
+    .dark .feature-title,.dark .article-title { color:#edf0f4; }
+    .dark .feature-summary,.dark .article-summary { color:#b2b8c1; }
+    .dark .source-avatar { background:#343b46; color:#d0d8e5; }
+    .dark .kicker { background:#253a55; color:#a8c7fa; }
+    .dark .interest,.dark .rail-title,.dark .article-footer .source-name { color:#d1d6dd; }
+    .dark .source-pill,.dark .topic-option { background:#24282e; border-color:#454c55; color:#c6cbd3; }
+    .dark .profile-dot { background:#334b69; color:#d8e7ff; }
+    .dark .select-control { color:var(--muted); }
+    @media (max-width: 1180px) { .layout { grid-template-columns: 218px minmax(0,1fr); gap: 24px; } .right-rail { display:none; } }
+    @media (max-width: 760px) {
+      .topbar { height: 64px; padding: 0 15px; gap: 12px; }
+      .brand { min-width: 0; gap: 9px; }
+      .brand-mark { width: 31px; height: 31px; }
+      .brand-name { font-size: 18px; }
+      .brand-sub { display:none; }
+      .top-actions { gap: 1px; }
+      .top-actions .profile-dot { display:none; }
+      .search-wrap { height: 41px; padding: 0 11px; }
+      .search-wrap input { font-size: 13px; }
+      .layout { display:block; padding: 19px 16px 88px; }
+      .sidebar { display:none; }
+      .main { max-width:none; }
+      .page-head { margin-top: 0; }
+      .head-note { font-size: 11px; }
+      .refresh-btn { padding: 9px 11px; font-size: 0; gap: 0; width: 38px; height: 38px; justify-content:center; }
+      .refresh-btn svg { width:18px; height:18px; }
+      .feature-card { grid-template-columns: 1fr; padding: 15px; gap: 12px; }
+      .feature-image { grid-row: 1; min-height: 155px; }
+      .feature-title { font-size: 20px; }
+      .feature-summary { margin-bottom: 11px; }
+      .article-card { grid-template-columns: minmax(0,1fr) 98px; gap: 12px; padding: 15px 1px; }
+      .article-thumb { width: 98px; height: 82px; }
+      .article-title { font-size: 14px; }
+      .article-summary { font-size: 11px; }
+      .feed-meta { align-items:flex-start; padding: 7px 0; }
+      .meta-controls { gap: 8px; }
+      .mobile-nav { display:flex; position:fixed; z-index:30; left:0; right:0; bottom:0; height:65px; padding:5px 12px calc(5px + env(safe-area-inset-bottom)); background:rgba(255,255,255,.96); border-top:1px solid var(--line); justify-content:space-around; backdrop-filter:blur(12px); }
+      .dark .mobile-nav { background:rgba(32,35,39,.96); }
+      .mobile-nav button { border:0; background:transparent; color:var(--muted); min-width:55px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-size:9px; }
+      .mobile-nav button.active { color:var(--blue); font-weight:700; }
+      .mobile-nav svg { width:19px; height:19px; }
+      .modal-topics { grid-template-columns:1fr; }
+    }
+    @media (max-width: 390px) { .brand-name { display:none; } .topbar { gap:8px; } .search-wrap { margin-left:3px; } .article-card { grid-template-columns:minmax(0,1fr) 84px; } .article-thumb { width:84px; height:76px; } }
+    .article-original,.feature-original{font-size:11px;color:var(--muted);margin-top:5px;font-style:italic}\n  .article-original:before{content:"Traduit du " attr(data-lang) " · "}\n</style>
+</head>
+<body>
+<div class="app-shell" id="app">
+  <header class="topbar">
+    <div class="brand" aria-label="Le Fil, actualités">
+      <div class="brand-mark"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5h6.2v6.2H4zM13.8 5.5H20v6.2h-6.2zM4 13.3h6.2v5.2H4zM13.8 13.3H20v5.2h-6.2z" fill="currentColor"/></svg></div>
+      <div><div class="brand-name">Le Fil</div><div class="brand-sub">L’actualité, à votre rythme</div></div>
+    </div>
+    <label class="search-wrap" aria-label="Rechercher dans l’actualité">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+      <input id="searchInput" type="search" placeholder="Rechercher un sujet, un média…" autocomplete="off" />
+    </label>
+    <div class="top-actions">
+      <button class="icon-btn" id="themeBtn" title="Changer de thème" aria-label="Changer de thème"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.2 15.1A8.3 8.3 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z"/></svg></button>
+      <button class="icon-btn" id="settingsBtn" title="Personnaliser" aria-label="Personnaliser"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z"/><path d="m19.4 13.5 1.1.8-1.1 1.9-1.3-.5a7.4 7.4 0 0 1-1.5.9l-.2 1.4h-2.2l-.3-1.4a7.4 7.4 0 0 1-1.7 0l-.7 1.2-2-.8.3-1.4a7.2 7.2 0 0 1-1.2-1.2l-1.4.3-.8-2 .0-.1 1.2-.7a7.4 7.4 0 0 1 0-1.7l-1.2-.7.8-2 1.4.3a7.2 7.2 0 0 1 1.2-1.2L9.5 5.4l2-.8.7 1.2a7.4 7.4 0 0 1 1.7 0l.3-1.4h2.2l.2 1.4a7.4 7.4 0 0 1 1.5.9l1.3-.5 1.1 1.9-1.1.8a7.4 7.4 0 0 1 0 1.7Z" transform="translate(-1 -1) scale(.98)"/></svg></button>
+      <div class="profile-dot" title="Profil">S</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="nav-group">
+        <div class="nav-label">Votre espace</div>
+        <button class="nav-item active" data-view="for-you"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 10.5 12 3.8l8.5 6.7v9.2a1 1 0 0 1-1 1h-5.2v-6.1H9.7v6.1H4.5a1 1 0 0 1-1-1z"/></svg>Pour vous</button>
+        <button class="nav-item" data-view="headlines"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/><path d="M17 15h3v5h-3z"/></svg>À la une</button>
+        <button class="nav-item" data-view="following"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>Vos sujets suivis</button>
+        <button class="nav-item" data-view="saved"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.8L6 21z"/></svg>Articles enregistrés <span class="nav-count" id="savedCount">0</span></button>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Vos thèmes</div>
+        <div id="sideTopics"></div>
+      </div>
+      <div class="sidebar-bottom">Les articles proviennent de médias externes. Le Fil organise les liens et extraits, sans remplacer les sources originales.</div>
+    </aside>
+
+    <main class="main">
+      <div class="page-head">
+        <div><div class="eyebrow" id="eyebrow">Votre sélection</div><h1 id="pageTitle">Pour vous</h1><div class="head-note" id="pageNote">Une sélection construite autour de vos centres d’intérêt.</div></div>
+        <button class="refresh-btn" id="refreshBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 12.1-2L20 12M4 12l2.3 5a7 7 0 0 0 12.1-2"/></svg>Actualiser</button>
+      </div>
+      <div class="topic-row" id="topicRow"></div>
+      <div class="feed-meta"><div id="feedCount">Préparation du fil…</div><div class="meta-controls"><button class="text-control" id="unreadBtn">Non lus</button><select class="select-control" id="sortSelect" aria-label="Trier les articles"><option value="newest">Plus récents</option><option value="oldest">Plus anciens</option></select></div></div>
+      <section id="feedContent"><div class="loading"><div class="loader"></div>Chargement de l’actualité…</div></section>
+    </main>
+
+    <aside class="right-rail">
+      <div class="rail-card">
+        <h3 class="rail-title">Vos centres d’intérêt</h3>
+        <p class="rail-sub">Activez les thèmes qui doivent nourrir votre fil.</p>
+        <div id="interestToggles"></div>
+        <button class="rail-link" id="editInterests">Gérer mes centres d’intérêt</button>
+      </div>
+      <div class="rail-card">
+        <h3 class="rail-title">Médias présents dans ce fil</h3>
+        <p class="rail-sub">Les sources évoluent selon les articles disponibles.</p>
+        <div id="sourcePills"><span class="source-pill">En attente des flux…</span></div>
+      </div>
+      <div class="rail-card">
+        <h3 class="rail-title">Votre fil apprend</h3>
+        <div class="tip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 21h4M8.5 14.5a6 6 0 1 1 7 0c-.7.5-1 1.1-1.1 1.5h-4.8c-.1-.4-.4-1-1.1-1.5Z"/></svg><span>Utilisez les commandes « Plus de sujets comme celui-ci » et « Moins de sujets comme celui-ci » sur les articles pour ajuster progressivement votre sélection.</span></div>
+      </div>
+    </aside>
+  </div>
+  <nav class="mobile-nav" aria-label="Navigation mobile">
+    <button data-view="for-you" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3.5 10.5 12 3.8l8.5 6.7v9.2a1 1 0 0 1-1 1h-5.2v-6.1H9.7v6.1H4.5a1 1 0 0 1-1-1z"/></svg>Pour vous</button>
+    <button data-view="headlines"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>À la une</button>
+    <button data-view="following"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>Suivis</button>
+    <button data-view="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.8L6 21z"/></svg>Enregistrés</button>
+  </nav>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="modalTitle">Personnaliser votre fil</h2><button class="icon-btn" id="closeModal" aria-label="Fermer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <p>Choisissez les thèmes à suivre. Votre sélection est conservée sur cet appareil.</p>
+    <div class="modal-topics" id="modalTopics"></div>
+    <div class="modal-actions"><button class="btn-secondary" id="cancelSettings">Annuler</button><button class="btn-primary" id="saveSettings">Enregistrer</button></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const TOPICS = [
+    { id:'epargne', label:'Épargne & placements', short:'Épargne', query:'épargne OR placements OR assurance vie OR marchés financiers' },
+    { id:'economie', label:'Économie', short:'Économie', query:'économie France OR économie internationale OR croissance inflation' },
+    { id:'industrie', label:'Industrie & innovation', short:'Industrie', query:'industrie OR réindustrialisation OR innovation industrielle' },
+    { id:'ia', label:'Intelligence artificielle', short:'Intelligence artificielle', query:'intelligence artificielle OR IA entreprises' },
+    { id:'rse', label:'RSE, climat & énergie', short:'RSE & climat', query:'RSE OR ESG OR climat OR transition énergétique' }
+  ];
+  const FEEDS_PER_TOPIC = 9;
+  const STORAGE_KEY = 'lefil-preferences-v1';
+  const ARTICLES_KEY = 'lefil-articles-cache-v1';
+  const DEFAULTS = { topics: TOPICS.map(t=>t.id), saved:[], savedItems:[], read:[], hidden:[], preference:{}, dark:false };
+  let prefs = loadPrefs();
+  let articles = [];
+  try { articles = JSON.parse(localStorage.getItem(ARTICLES_KEY) || '[]'); } catch { articles = []; }
+  let currentView = 'for-you';
+  let currentTopic = 'all';
+  let unreadOnly = false;
+  let isLoading = false;
+  let lastUpdated = null;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const cleanText = html => {
+    const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+    doc.querySelectorAll('script,style,iframe').forEach(n=>n.remove());
+    return (doc.body.textContent || '').replace(/\s+/g,' ').trim();
+  };
+  function loadPrefs(){
+    try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); return saved ? {...DEFAULTS,...saved, savedItems:Array.isArray(saved.savedItems)?saved.savedItems:[], preference:{...DEFAULTS.preference,...(saved.preference||{})}} : {...DEFAULTS}; }
+    catch { return {...DEFAULTS}; }
+  }
+  function savePrefs(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)); }
+  function toast(message){ const el=$('toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2400); }
+  function topicById(id){ return TOPICS.find(t=>t.id===id) || TOPICS[0]; }
+  function topicIcon(){ return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5m0 14h16M7 15l4-4 3 2 5-7"/></svg>`; }
+  function imageFallback(){ return `<div class="image-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m4 17 5-5 3 3 3-4 5 6"/></svg></div>`; }
+  function relativeDate(date){
+    const d = new Date(date); if (!Number.isFinite(d.getTime())) return 'Date inconnue';
+    const mins = Math.max(0, Math.floor((Date.now()-d.getTime())/60000));
+    if(mins<1) return 'À l’instant'; if(mins<60) return `Il y a ${mins} min`;
+    const h=Math.floor(mins/60); if(h<24) return `Il y a ${h} h`;
+    const days=Math.floor(h/24); if(days<7) return `Il y a ${days} j`;
+    return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+  }
+  function safeImage(url){
+    if(!url) return '';
+    try { const u=new URL(url); return ['http:','https:'].includes(u.protocol) ? u.href : ''; } catch { return ''; }
+  }
+  function parseXml(xml, topic){
+    const doc = new DOMParser().parseFromString(xml,'text/xml');
+    if(doc.querySelector('parsererror')) throw new Error('Flux RSS illisible');
+    return [...doc.querySelectorAll('item')].map(item=>{
+      const title = cleanText(item.querySelector('title')?.textContent || 'Article sans titre');
+      const link = item.querySelector('link')?.textContent?.trim() || '';
+      const source = cleanText(item.querySelector('source')?.textContent || 'Source externe');
+      const desc = cleanText(item.querySelector('description')?.textContent || '');
+      const date = item.querySelector('pubDate')?.textContent || new Date().toISOString();
+      const media = item.getElementsByTagNameNS('http://search.yahoo.com/mrss/','content')[0] || item.getElementsByTagNameNS('http://search.yahoo.com/mrss/','thumbnail')[0];
+      const enclosure = item.querySelector('enclosure');
+      let img = media?.getAttribute('url') || enclosure?.getAttribute('url') || '';
+      if(!img){ const raw=item.querySelector('description')?.textContent||''; const match=raw.match(/<img[^>]+src=["']([^"']+)["']/i); if(match) img=match[1]; }
+      return normalizeArticle({title,link,source,summary:desc,date,image:img,topic:topic.id});
+    }).filter(a=>a.title && a.link);
+  }
+  function normalizeArticle(raw){
+    let title=raw.title || '';
+    let source=raw.source || raw.author || 'Média';
+    const suffix = new RegExp('\\s[-|–]\\s'+source.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'$','i');
+    title=title.replace(suffix,'').trim();
+    return { id: hash(`${title}|${raw.link}`), title, originalTitle:raw.originalTitle||'', language:raw.language||'fr', translated:!!raw.translated, link:raw.link, source, summary:cleanText(raw.summary||'').slice(0,360), date:raw.date||new Date().toISOString(), image:safeImage(raw.image), topic:raw.topic, read:false };
+  }
+  function hash(str){ let h=2166136261; for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);} return (h>>>0).toString(36); }
+  async function fetchTopic(topic){
+    const response = await fetch(`/.netlify/functions/news?topic=${encodeURIComponent(topic.id)}`, {
+      cache:'no-store',
+      headers:{'Accept':'application/json'}
+    });
+    if(!response.ok) throw new Error(`Serveur actualités : ${response.status}`);
+    const data = await response.json();
+    if(!Array.isArray(data.items)) throw new Error(data.error || 'Réponse du serveur invalide');
+    return data.items.slice(0,FEEDS_PER_TOPIC).map(item=>normalizeArticle({...item,topic:topic.id})).filter(a=>a.title&&a.link);
+  }
+  async function refresh(showToast=true){
+    if(isLoading) return;
+    isLoading=true;
+    const btn=$('refreshBtn'); btn.disabled=true; btn.classList.add('spinning');
+    $('feedContent').innerHTML='<div class="loading"><div class="loader"></div>Recherche des derniers articles…<p style="font-size:12px">Les sources peuvent prendre quelques secondes à répondre.</p></div>';
+    $('feedCount').textContent='Mise à jour des sources…';
+    const enabled=TOPICS.filter(t=>prefs.topics.includes(t.id));
+    try {
+      const results=await Promise.allSettled(enabled.map(fetchTopic));
+      const fresh=results.filter(r=>r.status==='fulfilled').flatMap(r=>r.value);
+      const failed=results.filter(r=>r.status==='rejected').length;
+      const unique=new Map();
+      fresh.forEach(a=>{ if(!unique.has(a.id)) unique.set(a.id,a); });
+      if(unique.size){
+        articles=[...unique.values()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+        try { localStorage.setItem(ARTICLES_KEY,JSON.stringify(articles)); } catch {}
+        lastUpdated=new Date();
+      }
+      isLoading=false; btn.disabled=false; btn.classList.remove('spinning');
+      render(); renderSources();
+      if(showToast){
+        if(articles.length && unique.size) toast(`${articles.length} articles disponibles${failed?` · ${failed} rubrique(s) indisponible(s)`:''}`);
+        else if(articles.length) toast('Actualisation impossible : affichage des derniers articles mémorisés');
+        else toast('Les flux sont injoignables. Utilisez les accès directs aux rubriques.');
+      }
+      if(!unique.size && !articles.length) showFeedError();
+    } catch(error) {
+      isLoading=false; btn.disabled=false; btn.classList.remove('spinning');
+      if(articles.length){ render(); toast('Connexion aux flux impossible. Derniers articles conservés.'); }
+      else showFeedError();
+    }
+  }
+  function showFeedError(){
+    const links=TOPICS.filter(t=>prefs.topics.includes(t.id)).map(t=>`<a class="topic-chip" style="display:inline-block;margin:5px" target="_blank" rel="noopener" href="https://news.google.com/search?q=${encodeURIComponent(t.query)}&hl=fr&gl=FR&ceid=FR%3Afr">${esc(t.short)} ↗</a>`).join('');
+    $('feedCount').textContent='Aucun flux reçu';
+    $('feedContent').innerHTML=`<div class="empty"><h3>Impossible de joindre les flux d’actualité</h3><p>Le navigateur ou le réseau bloque peut-être les services RSS externes. Tu peux ouvrir directement chaque rubrique dans Google Actualités, ou réessayer.</p><div style="margin:14px 0">${links}</div><button id="retryBtn">Réessayer</button></div>`;
+    $('retryBtn').addEventListener('click',()=>refresh());
+  }
+  function getVisibleArticles(){
+    let list=[...articles];
+    if(currentView==='saved') list=[...(prefs.savedItems||[])];
+    else if(currentView==='following') list=list.filter(a=>prefs.topics.includes(a.topic));
+    if(currentTopic!=='all') list=list.filter(a=>a.topic===currentTopic);
+    if(unreadOnly) list=list.filter(a=>!prefs.read.includes(a.id));
+    const search=$('searchInput').value.trim().toLocaleLowerCase('fr');
+    if(search) list=list.filter(a=>`${a.title} ${a.summary} ${a.source} ${topicById(a.topic).label}`.toLocaleLowerCase('fr').includes(search));
+    list=list.filter(a=>!prefs.hidden.includes(a.id));
+    list.sort((a,b)=>{
+      const pref=(prefs.preference[b.topic]||0)-(prefs.preference[a.topic]||0);
+      if(currentView==='for-you' && pref!==0) return pref;
+      const diff=new Date(b.date)-new Date(a.date);
+      return $('sortSelect').value==='oldest' ? -diff : diff;
+    });
+    return list;
+  }
+  function pageInfo(){
+    const map={
+      'for-you':['Votre sélection','Pour vous','Une sélection construite autour de vos centres d’intérêt.'],
+      'headlines':['Le panorama','À la une','Les dernières nouvelles des rubriques que vous suivez.'],
+      'following':['Vos abonnements','Vos sujets suivis','Les thèmes que vous avez choisi de suivre.'],
+      'saved':['Votre bibliothèque','Articles enregistrés','Retrouvez ici les articles gardés pour plus tard.']
+    };
+    const x=map[currentView]; $('eyebrow').textContent=x[0]; $('pageTitle').textContent=currentTopic==='all'?x[1]:topicById(currentTopic).label; $('pageNote').textContent=x[2];
+  }
+  function renderTopics(){
+    $('topicRow').innerHTML=[{id:'all',short:'Tout'} ,...TOPICS.filter(t=>prefs.topics.includes(t.id))].map(t=>`<button class="topic-chip ${currentTopic===t.id?'active':''}" data-topic="${t.id}">${esc(t.short)}</button>`).join('');
+    $('topicRow').querySelectorAll('[data-topic]').forEach(b=>b.addEventListener('click',()=>{currentTopic=b.dataset.topic;render();}));
+    $('sideTopics').innerHTML=TOPICS.filter(t=>prefs.topics.includes(t.id)).map(t=>`<button class="nav-item ${currentTopic===t.id?'active':''}" data-side-topic="${t.id}">${topicIcon()}${esc(t.label)}</button>`).join('');
+    $('sideTopics').querySelectorAll('[data-side-topic]').forEach(b=>b.addEventListener('click',()=>{currentTopic=b.dataset.sideTopic;currentView='for-you';syncNav();render();}));
+  }
+  function syncNav(){
+    document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
+    $('savedCount').textContent=prefs.saved.length;
+  }
+  function cardActions(a){
+    const saved=prefs.saved.includes(a.id);
+    return `<div class="card-actions"><button class="mini-action ${saved?'saved':''}" data-save="${a.id}" title="${saved?'Retirer des enregistrés':'Enregistrer'}" aria-label="Enregistrer"><svg viewBox="0 0 24 24" fill="${saved?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8"><path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-3.8L6 21z"/></svg></button><button class="mini-action" data-more="${a.id}" title="Plus de sujets comme celui-ci" aria-label="Plus de sujets comme celui-ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></button><button class="mini-action" data-less="${a.id}" title="Moins de sujets comme celui-ci" aria-label="Moins de sujets comme celui-ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14"/></svg></button></div>`;
+  }
+  function articleMarkup(a, index){
+    const t=topicById(a.topic); const img=safeImage(a.image); const isRead=prefs.read.includes(a.id);
+    return `<article class="article-card" data-article="${a.id}"><div class="article-main"><div class="article-category">${esc(t.short)}</div><a class="article-title" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer" data-open="${a.id}">${esc(a.title)}</a>${a.translated&&a.originalTitle?`<div class="article-original">Titre original : ${esc(a.originalTitle)}</div>`:'' }${a.summary?`<div class="article-summary">${esc(a.summary)}</div>`:''}<div class="article-footer"><span class="source-name">${esc(a.source)}</span><span class="dot"></span><span>${esc(relativeDate(a.date))}</span>${isRead?'<span class="dot"></span><span>Lu</span>':''}${cardActions(a)}</div></div><div class="article-thumb">${img?`<img src="${esc(img)}" alt="" loading="lazy" onerror="this.remove()">`:''}${imageFallback()}</div></article>`;
+  }
+  function featureMarkup(a){
+    const img=safeImage(a.image); const t=topicById(a.topic);
+    return `<article class="feature-card"><div class="feature-copy"><div class="kicker">${esc(t.short)} <span>·</span> À découvrir</div><a class="feature-title" href="${esc(a.link)}" target="_blank" rel="noopener noreferrer" data-open="${a.id}">${esc(a.title)}</a>${a.translated&&a.originalTitle?`<div class="article-original">Titre original : ${esc(a.originalTitle)}</div>`:'' }${a.summary?`<div class="feature-summary">${esc(a.summary)}</div>`:''}<div class="source-line"><span class="source-avatar">${esc((a.source||'M').slice(0,1).toUpperCase())}</span><strong>${esc(a.source)}</strong><span class="source-time">· ${esc(relativeDate(a.date))}</span>${cardActions(a)}</div></div><div class="feature-image">${img?`<img src="${esc(img)}" alt="" loading="lazy" onerror="this.remove()">`:''}${imageFallback()}</div></article>`;
+  }
+  function render(){
+    pageInfo(); renderTopics(); syncNav();
+    const list=getVisibleArticles();
+    $('feedCount').innerHTML=`<strong>${list.length}</strong> article${list.length>1?'s':''}${lastUpdated?` · Actualisé à ${lastUpdated.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`:''}`;
+    if(!articles.length){
+      $('feedContent').innerHTML=`<div class="empty"><div class="image-placeholder" style="position:static;height:34px">${imageFallback()}</div><h3>Le fil n’a pas encore reçu d’articles</h3><p>La récupération des flux RSS a échoué ou votre connexion est indisponible. Vous pouvez relancer l’actualisation.</p><button id="retryBtn">Réessayer</button></div>`;
+      $('retryBtn').addEventListener('click',()=>refresh()); return;
+    }
+    if(!list.length){
+      const msg=currentView==='saved'?'Vous n’avez pas encore enregistré d’article.':'Aucun article ne correspond à cette sélection.';
+      $('feedContent').innerHTML=`<div class="empty"><h3>Rien à afficher pour le moment</h3><p>${msg} Essayez une autre rubrique ou modifiez votre recherche.</p><button id="resetFilters">Réinitialiser les filtres</button></div>`;
+      $('resetFilters').addEventListener('click',()=>{currentTopic='all';unreadOnly=false;$('searchInput').value='';render();}); return;
+    }
+    const showFeature=(currentView==='for-you'&&currentTopic==='all'&&!unreadOnly&&!$('searchInput').value.trim());
+    const first=showFeature?list[0]:null;
+    const rest=first?list.slice(1):list;
+    $('feedContent').innerHTML=(first?featureMarkup(first):'')+`<div class="article-list">${rest.map(articleMarkup).join('')}</div>`;
+    bindCardActions();
+  }
+  function bindCardActions(){
+    document.querySelectorAll('[data-save]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const id=b.dataset.save; if(prefs.saved.includes(id)){prefs.saved=prefs.saved.filter(x=>x!==id);prefs.savedItems=(prefs.savedItems||[]).filter(x=>x.id!==id);} else {const item=articles.find(x=>x.id===id);if(item){prefs.saved.unshift(id);prefs.savedItems=[item,...(prefs.savedItems||[]).filter(x=>x.id!==id)];}} savePrefs();render();toast(prefs.saved.includes(id)?'Article enregistré':'Article retiré des enregistrés');}));
+    document.querySelectorAll('[data-more]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const a=articles.find(x=>x.id===b.dataset.more);if(a){prefs.preference[a.topic]=(prefs.preference[a.topic]||0)+2;savePrefs();render();toast(`Davantage d’articles « ${topicById(a.topic).short} »`);}}));
+    document.querySelectorAll('[data-less]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const a=articles.find(x=>x.id===b.dataset.less);if(a){prefs.preference[a.topic]=(prefs.preference[a.topic]||0)-3;prefs.hidden.push(a.id);savePrefs();render();toast('Ce type de contenu sera moins présent');}}));
+    document.querySelectorAll('[data-open]').forEach(a=>a.addEventListener('click',()=>{const id=a.dataset.open;if(!prefs.read.includes(id)){prefs.read.push(id);savePrefs();}}));
+  }
+  function renderSources(){
+    const names=[...new Set(articles.map(a=>a.source).filter(Boolean))].slice(0,12);
+    $('sourcePills').innerHTML=names.length?names.map(n=>`<span class="source-pill">${esc(n)}</span>`).join(''):'<span class="source-pill">Aucune source chargée</span>';
+  }
+  function renderInterests(){
+    $('interestToggles').innerHTML=TOPICS.map(t=>`<div class="interest"><span>${esc(t.label)}</span><button class="toggle ${prefs.topics.includes(t.id)?'on':''}" data-toggle-topic="${t.id}" aria-label="Activer ${esc(t.label)}"></button></div>`).join('');
+    $('interestToggles').querySelectorAll('[data-toggle-topic]').forEach(b=>b.addEventListener('click',()=>toggleTopic(b.dataset.toggleTopic)));
+  }
+  function toggleTopic(id){
+    if(prefs.topics.includes(id)){prefs.topics=prefs.topics.filter(x=>x!==id);if(currentTopic===id)currentTopic='all';}
+    else prefs.topics.push(id);
+    if(!prefs.topics.length){prefs.topics=[id];toast('Gardez au moins un thème actif.');}
+    savePrefs();renderInterests();render();refresh(false);
+  }
+  function openSettings(){
+    $('modalTopics').innerHTML=TOPICS.map(t=>`<label class="topic-option"><input type="checkbox" value="${t.id}" ${prefs.topics.includes(t.id)?'checked':''}><span>${esc(t.label)}</span></label>`).join('');
+    $('settingsModal').classList.add('open');
+  }
+  function closeSettings(){ $('settingsModal').classList.remove('open'); }
+  function saveSettings(){
+    const selected=[...$('modalTopics').querySelectorAll('input:checked')].map(i=>i.value);
+    if(!selected.length){toast('Sélectionnez au moins un thème.');return;}
+    prefs.topics=selected; if(currentTopic!=='all'&&!selected.includes(currentTopic))currentTopic='all'; savePrefs();closeSettings();renderInterests();render();refresh(false);toast('Vos centres d’intérêt ont été mis à jour');
+  }
+  function applyTheme(){document.body.classList.toggle('dark',!!prefs.dark);}
+
+  document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{currentView=b.dataset.view;currentTopic='all';unreadOnly=false;syncNav();render();}));
+  $('searchInput').addEventListener('input',()=>render());
+  $('refreshBtn').addEventListener('click',()=>refresh());
+  $('sortSelect').addEventListener('change',()=>render());
+  $('unreadBtn').addEventListener('click',()=>{unreadOnly=!unreadOnly;$('unreadBtn').textContent=unreadOnly?'Tous les articles':'Non lus';$('unreadBtn').style.color=unreadOnly?'var(--green)':'var(--blue)';render();});
+  $('themeBtn').addEventListener('click',()=>{prefs.dark=!prefs.dark;savePrefs();applyTheme();});
+  $('settingsBtn').addEventListener('click',openSettings); $('editInterests').addEventListener('click',openSettings);
+  $('closeModal').addEventListener('click',closeSettings); $('cancelSettings').addEventListener('click',closeSettings); $('saveSettings').addEventListener('click',saveSettings);
+  $('settingsModal').addEventListener('click',e=>{if(e.target===$('settingsModal'))closeSettings();});
+  applyTheme(); renderInterests(); render(); refresh(false);
+})();
+</script>
+</body>
+</html>
