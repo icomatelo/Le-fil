@@ -158,6 +158,15 @@
     .dark .interest,.dark .rail-title,.dark .article-footer .source-name { color:#d1d6dd; }
     .dark .source-pill,.dark .topic-option { background:#24282e; border-color:#454c55; color:#c6cbd3; }
     .dark .profile-dot { background:#334b69; color:#d8e7ff; }
+    .profile-button { border:0; cursor:pointer; font-family:inherit; }
+    .profile-button:hover { outline:2px solid #b6cdf0; }
+    .profile-name-field { width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:11px; margin:4px 0 14px; background:var(--surface); color:var(--text); }
+    .account-status { border-radius:12px; background:var(--surface-2); padding:12px; font-size:12px; line-height:1.5; color:var(--muted); margin:12px 0; }
+    .account-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .account-actions button { flex:1; min-width:130px; }
+    .account-note { font-size:11px!important; color:var(--subtle)!important; margin-top:12px!important; }
+    .sync-badge { display:inline-flex; border-radius:20px; padding:4px 8px; background:#e6f4ea; color:#137333; font-size:10px; font-weight:700; }
+    .dark .sync-badge { background:#173b2a; color:#9bd5ae; }
     .dark .select-control { color:var(--muted); }
     @media (max-width: 1180px) { .layout { grid-template-columns: 218px minmax(0,1fr); gap: 24px; } .right-rail { display:none; } }
     @media (max-width: 760px) {
@@ -167,7 +176,7 @@
       .brand-name { font-size: 18px; }
       .brand-sub { display:none; }
       .top-actions { gap: 1px; }
-      .top-actions .profile-dot { display:none; }
+      .top-actions .profile-dot { display:grid; }
       .search-wrap { height: 41px; padding: 0 11px; }
       .search-wrap input { font-size: 13px; }
       .layout { display:block; padding: 19px 16px 88px; }
@@ -211,7 +220,7 @@
     <div class="top-actions">
       <button class="icon-btn" id="themeBtn" title="Changer de thème" aria-label="Changer de thème"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.2 15.1A8.3 8.3 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z"/></svg></button>
       <button class="icon-btn" id="settingsBtn" title="Personnaliser" aria-label="Personnaliser"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z"/><path d="m19.4 13.5 1.1.8-1.1 1.9-1.3-.5a7.4 7.4 0 0 1-1.5.9l-.2 1.4h-2.2l-.3-1.4a7.4 7.4 0 0 1-1.7 0l-.7 1.2-2-.8.3-1.4a7.2 7.2 0 0 1-1.2-1.2l-1.4.3-.8-2 .0-.1 1.2-.7a7.4 7.4 0 0 1 0-1.7l-1.2-.7.8-2 1.4.3a7.2 7.2 0 0 1 1.2-1.2L9.5 5.4l2-.8.7 1.2a7.4 7.4 0 0 1 1.7 0l.3-1.4h2.2l.2 1.4a7.4 7.4 0 0 1 1.5.9l1.3-.5 1.1 1.9-1.1.8a7.4 7.4 0 0 1 0 1.7Z" transform="translate(-1 -1) scale(.98)"/></svg></button>
-      <div class="profile-dot" title="Profil">S</div>
+      <button class="profile-dot profile-button" id="profileBtn" title="Mon profil" aria-label="Ouvrir mon profil">P</button>
     </div>
   </header>
 
@@ -271,12 +280,31 @@
 <div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal">
     <div class="modal-head"><h2 id="modalTitle">Personnaliser votre fil</h2><button class="icon-btn" id="closeModal" aria-label="Fermer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
-    <p>Choisissez les thèmes à suivre. Votre sélection est conservée sur cet appareil.</p>
+    <p>Choisissez vos centres d’intérêt principaux. Vous pourrez les modifier à tout moment. Par défaut, votre profil reste sur cet appareil.</p>
     <div class="modal-topics" id="modalTopics"></div>
     <div class="modal-actions"><button class="btn-secondary" id="cancelSettings">Annuler</button><button class="btn-primary" id="saveSettings">Enregistrer</button></div>
   </div>
 </div>
 
+<div class="modal-backdrop" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="profileTitle">Mon profil Le Fil</h2><button class="icon-btn" id="closeProfile" aria-label="Fermer">×</button></div>
+    <p>Par défaut, votre profil reste sur cet appareil. Vous pouvez créer un compte facultatif pour le retrouver sur vos autres appareils.</p>
+    <label for="profileName" style="font-size:12px;font-weight:650">Nom ou pseudonyme (facultatif)</label>
+    <input class="profile-name-field" id="profileName" maxlength="40" placeholder="Ex. Alex" />
+    <div class="account-status" id="accountStatus">Mode local actif : vos centres d’intérêt, favoris et préférences restent dans ce navigateur.</div>
+    <div id="syncForm">
+      <label for="profileEmail" style="font-size:12px;font-weight:650">Adresse e-mail pour synchroniser</label>
+      <input class="profile-name-field" id="profileEmail" type="email" autocomplete="email" placeholder="vous@exemple.fr" />
+      <div class="account-actions"><button class="btn-primary" id="syncLogin">Recevoir un lien de connexion</button><button class="btn-secondary" id="syncLogout" style="display:none">Se déconnecter</button></div>
+      <p class="account-note" id="syncNote">La synchronisation multi-appareils sera disponible après configuration du service de comptes. Le mode local fonctionne immédiatement, sans inscription.</p>
+    </div>
+    <div class="modal-actions"><button class="btn-secondary" id="closeProfileBottom">Fermer</button><button class="btn-primary" id="saveProfileName">Enregistrer</button></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./config.js"></script>
 <script>
 (() => {
   const TOPICS = [
@@ -289,7 +317,7 @@
   const FEEDS_PER_TOPIC = 9;
   const STORAGE_KEY = 'lefil-preferences-v1';
   const ARTICLES_KEY = 'lefil-articles-cache-v1';
-  const DEFAULTS = { topics: TOPICS.map(t=>t.id), saved:[], savedItems:[], read:[], hidden:[], preference:{}, dark:false };
+  const DEFAULTS = { topics: TOPICS.map(t=>t.id), saved:[], savedItems:[], read:[], hidden:[], preference:{}, dark:false, profileName:"" };
   let prefs = loadPrefs();
   let articles = [];
   try { articles = JSON.parse(localStorage.getItem(ARTICLES_KEY) || '[]'); } catch { articles = []; }
@@ -298,6 +326,45 @@
   let unreadOnly = false;
   let isLoading = false;
   let lastUpdated = null;
+  let supabaseClient=null, cloudUser=null, syncTimer=null, cloudReady=false;
+  const supabaseConfig=window.LEFIL_SUPABASE||{};
+  function initCloud(){
+    if(!window.supabase?.createClient || !supabaseConfig.url || !supabaseConfig.anonKey) return;
+    try {
+      supabaseClient=window.supabase.createClient(supabaseConfig.url,supabaseConfig.anonKey); cloudReady=true;
+      supabaseClient.auth.getSession().then(({data})=>{if(data?.session)activateCloudUser(data.session.user);});
+      supabaseClient.auth.onAuthStateChange((_event,session)=>{if(session?.user)activateCloudUser(session.user);else{cloudUser=null;updateProfileUI();}});
+    } catch(e){console.warn('Configuration Supabase invalide',e);}
+  }
+  async function activateCloudUser(user){
+    if(!supabaseClient||!user)return; cloudUser=user; updateProfileUI();
+    try{
+      const {data,error}=await supabaseClient.from('profiles').select('preferences').eq('id',user.id).maybeSingle();
+      if(error)throw error;
+      if(data?.preferences){prefs={...DEFAULTS,...data.preferences,preference:{...DEFAULTS.preference,...(data.preferences.preference||{})}};savePrefsLocalOnly();renderInterests();render();applyTheme();toast('Profil synchronisé');}
+      else{await pushCloudProfile();toast('Profil local associé à votre compte');}
+    }catch(e){console.error(e);toast('Compte connecté, synchronisation à vérifier');}
+    updateProfileUI();
+  }
+  function savePrefsLocalOnly(){localStorage.setItem(STORAGE_KEY,JSON.stringify(prefs));}
+  async function pushCloudProfile(){if(!cloudUser||!supabaseClient)return;const {error}=await supabaseClient.from('profiles').upsert({id:cloudUser.id,preferences:prefs,updated_at:new Date().toISOString()});if(error){console.error(error);toast('Synchronisation impossible');}}
+  function updateProfileUI(){
+    const name=(prefs.profileName||cloudUser?.email?.split('@')[0]||'Profil').trim();
+    $('profileBtn').textContent=name.slice(0,1).toUpperCase(); $('profileBtn').title=cloudUser?`Connecté : ${cloudUser.email}`:'Profil local';
+    $('profileName').value=prefs.profileName||''; $('syncLogout').style.display=cloudUser?'inline-block':'none';
+    $('profileEmail').style.display=cloudUser?'none':'block'; $('syncLogin').style.display=cloudUser?'none':'inline-block';
+    $('accountStatus').innerHTML=cloudUser?`<span class="sync-badge">Profil synchronisé</span><br>Connecté avec ${esc(cloudUser.email)}. Vos préférences et articles enregistrés sont synchronisés.`:'Mode local actif : vos centres d’intérêt, favoris et préférences restent dans ce navigateur.';
+    $('syncNote').textContent=cloudReady?'Un lien sécurisé sera envoyé à votre adresse e-mail. Ouvrez-le sur chaque appareil pour retrouver votre profil.':'La synchronisation multi-appareils doit être activée par configuration Supabase. Le mode local fonctionne immédiatement, sans inscription.';
+  }
+  function openProfile(){updateProfileUI();$('profileModal').classList.add('open');}
+  function closeProfile(){$('profileModal').classList.remove('open');}
+  async function sendMagicLink(){
+    if(!cloudReady||!supabaseClient){toast('La synchronisation multi-appareils doit d’abord être configurée sur le site.');return;}
+    const email=$('profileEmail').value.trim(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){toast('Saisissez une adresse e-mail valide.');return;}
+    const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin}});
+    if(error){toast('Envoi impossible : '+error.message);return;} toast('Lien de connexion envoyé par e-mail');
+    $('accountStatus').textContent='Consultez votre boîte e-mail et ouvrez le lien de connexion sur cet appareil.';
+  }
 
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -310,7 +377,10 @@
     try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); return saved ? {...DEFAULTS,...saved, savedItems:Array.isArray(saved.savedItems)?saved.savedItems:[], preference:{...DEFAULTS.preference,...(saved.preference||{})}} : {...DEFAULTS}; }
     catch { return {...DEFAULTS}; }
   }
-  function savePrefs(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)); }
+  function savePrefs(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    if(cloudUser && supabaseClient){ clearTimeout(syncTimer); syncTimer=setTimeout(()=>pushCloudProfile(),900); }
+  }
   function toast(message){ const el=$('toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),2400); }
   function topicById(id){ return TOPICS.find(t=>t.id===id) || TOPICS[0]; }
   function topicIcon(){ return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5m0 14h16M7 15l4-4 3 2 5-7"/></svg>`; }
@@ -507,7 +577,14 @@
   $('settingsBtn').addEventListener('click',openSettings); $('editInterests').addEventListener('click',openSettings);
   $('closeModal').addEventListener('click',closeSettings); $('cancelSettings').addEventListener('click',closeSettings); $('saveSettings').addEventListener('click',saveSettings);
   $('settingsModal').addEventListener('click',e=>{if(e.target===$('settingsModal'))closeSettings();});
-  applyTheme(); renderInterests(); render(); refresh(false);
+  $('profileBtn').addEventListener('click',openProfile); $('closeProfile').addEventListener('click',closeProfile); $('closeProfileBottom').addEventListener('click',closeProfile);
+  $('profileModal').addEventListener('click',e=>{if(e.target===$('profileModal'))closeProfile();});
+  $('saveProfileName').addEventListener('click',()=>{prefs.profileName=$('profileName').value.trim();savePrefs();updateProfileUI();toast('Profil enregistré');});
+  $('syncLogin').addEventListener('click',sendMagicLink);
+  $('syncLogout').addEventListener('click',async()=>{if(supabaseClient)await supabaseClient.auth.signOut();cloudUser=null;updateProfileUI();toast('Déconnecté. Votre profil local est conservé.');});
+  const firstVisit = !localStorage.getItem(STORAGE_KEY);
+  initCloud(); updateProfileUI(); applyTheme(); renderInterests(); render(); refresh(false);
+  if(firstVisit) setTimeout(openSettings,450);
 })();
 </script>
 </body>
