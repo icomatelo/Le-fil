@@ -1,5 +1,6 @@
 const FEEDS = {
   epargne: [
+    ['Le Canard enchaîné','https://www.lecanardenchaine.fr/rss/index.xml','fr'],
     ['Mediapart','https://www.mediapart.fr/articles/feed','fr'],
     ['Blast','https://api.blast-info.fr/rss.xml','fr'],
     ['The Intercept','https://theintercept.com/feed/?rss','en'],
@@ -7,6 +8,7 @@ const FEEDS = {
     ['Follow the Money','https://www.ftm.eu/rss','en']
   ],
   economie: [
+    ['Le Canard enchaîné','https://www.lecanardenchaine.fr/rss/index.xml','fr'],
     ['Mediapart','https://www.mediapart.fr/articles/feed','fr'],
     ['Blast','https://api.blast-info.fr/rss.xml','fr'],
     ['Basta!','https://basta.media/spip.php?page=backend','fr'],
@@ -15,6 +17,7 @@ const FEEDS = {
     ['openDemocracy','https://www.opendemocracy.net/rss/','en']
   ],
   industrie: [
+    ['Le Canard enchaîné','https://www.lecanardenchaine.fr/rss/index.xml','fr'],
     ['Blast','https://api.blast-info.fr/rss.xml','fr'],
     ['Mediapart','https://www.mediapart.fr/articles/feed','fr'],
     ['The Intercept','https://theintercept.com/feed/?rss','en'],
@@ -22,6 +25,7 @@ const FEEDS = {
     ['openDemocracy','https://www.opendemocracy.net/rss/','en']
   ],
   ia: [
+    ['Le Canard enchaîné','https://www.lecanardenchaine.fr/rss/index.xml','fr'],
     ['The Intercept','https://theintercept.com/feed/?rss','en'],
     ['ProPublica','https://www.propublica.org/feeds/propublica/main','en'],
     ['Mediapart','https://www.mediapart.fr/articles/feed','fr'],
@@ -29,6 +33,7 @@ const FEEDS = {
     ['Democracy Now!','https://www.democracynow.org/democracynow.rss','en']
   ],
   rse: [
+    ['Le Canard enchaîné','https://www.lecanardenchaine.fr/rss/index.xml','fr'],
     ['Reporterre','https://reporterre.net/spip.php?page=backend-simple','fr'],
     ['Blast','https://api.blast-info.fr/rss.xml','fr'],
     ['Mediapart','https://www.mediapart.fr/articles/feed','fr'],
@@ -65,7 +70,9 @@ async function fetchFeed(feed){
  return blocks.slice(0,8).map(b=>({source,language,originalTitle:field(b,'title'),originalSummary:field(b,'description')||field(b,'summary')||field(b,'content:encoded'),link:linkOf(b),date:dateOf(b),image:imgOf(b)})).filter(x=>x.originalTitle&&/^https?:\/\//i.test(x.link));
 }
 exports.handler=async(event)=>{
- const topic=event.queryStringParameters?.topic;
+ const params=event.queryStringParameters||{};
+ if(params.catalog==='1')return{statusCode:200,headers,body:JSON.stringify({sources:[{name:'Le Canard enchaîné',status:'active',feeds:['https://www.lecanardenchaine.fr/rss/index.xml','https://www.lecanardenchaine.fr/rss/categories/politique.xml','https://www.lecanardenchaine.fr/rss/categories/societe.xml','https://www.lecanardenchaine.fr/rss/categories/medias.xml','https://www.lecanardenchaine.fr/rss/categories/international.xml']},{name:'Charlie Hebdo',status:'catalogue-only',website:'https://charliehebdo.fr/',feeds:['https://charliehebdo.fr/tag/iran/feed/','https://charliehebdo.fr/tag/turquie/feed/'],note:'Flux thématiques uniquement ; aucun flux général validé.'}]})};
+ const topic=params.topic;
  if(!FEEDS[topic])return{statusCode:400,headers,body:JSON.stringify({error:'Rubrique inconnue'})};
  const settled=await Promise.allSettled(FEEDS[topic].map(fetchFeed));
  const raw=settled.filter(x=>x.status==='fulfilled').flatMap(x=>x.value);
