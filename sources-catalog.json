@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "description": "Catalogue des sources éditoriales de Le Fil. Les flux sont des adresses publiques ; vérifier leur disponibilité avant activation.",
+  "sources": [
+    {
+      "id": "le-canard-enchaine",
+      "name": "Le Canard enchaîné",
+      "country": "France",
+      "category": "Presse satirique",
+      "status": "active",
+      "feeds": [
+        {
+          "label": "Général",
+          "url": "https://www.lecanardenchaine.fr/rss/index.xml"
+        },
+        {
+          "label": "Politique",
+          "url": "https://www.lecanardenchaine.fr/rss/categories/politique.xml"
+        },
+        {
+          "label": "Société",
+          "url": "https://www.lecanardenchaine.fr/rss/categories/societe.xml"
+        },
+        {
+          "label": "Médias",
+          "url": "https://www.lecanardenchaine.fr/rss/categories/medias.xml"
+        },
+        {
+          "label": "International",
+          "url": "https://www.lecanardenchaine.fr/rss/categories/international.xml"
+        }
+      ]
+    },
+    {
+      "id": "charlie-hebdo",
+      "name": "Charlie Hebdo",
+      "country": "France",
+      "category": "Presse satirique",
+      "status": "catalogue-only",
+      "website": "https://charliehebdo.fr/",
+      "note": "Aucun flux général validé. Flux thématiques repérés : Iran et Turquie.",
+      "feeds": [
+        {
+          "label": "Iran",
+          "url": "https://charliehebdo.fr/tag/iran/feed/"
+        },
+        {
+          "label": "Turquie",
+          "url": "https://charliehebdo.fr/tag/turquie/feed/"
+        }
+      ]
+    }
+  ]
+}
